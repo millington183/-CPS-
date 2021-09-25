@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flushbonading.cps.mapper.UserMapper">
+    <update id="updatePasswordByStaffNumber">
+        UPDATE t_user
+        SET
+        password=#{password},salt=#{salt}
+        WHERE
+        staff_number=#{staffNumber}
+    </update>
+
+    <!--查询所有用户信息-->
+    <select id="getAllUserMessage" resultType="com.flushbonading.cps.entity.vo.UserManageVO">
+        SELECT
+            t_user.staff_number,t_staff.name,t_department.department_name,t_post.post_name,t_role.role_name
+        FROM
+            t_user,t_staff,t_department,t_post,t_role
+        WHERE
+            t_user.staff_number=t_staff.staff_number
+        AND
+            t_user.role_id=t_role.role_id
+        AND
+            t_staff.post_id=t_post.id
+        AND
+            t_staff.department_id=t_department.id
+        AND
+            t_staff.name like CONCAT('%',#{search.name},'%')
+        AND
+            t_user.staff_number like CONCAT('%',#{search.staffNumber},'%')
+        ORDER BY t_user.create_time desc
+        LiMIT #{page},7
+    </select>
+    <select id="userCounts" resultType="int">
+        SELECT
+            COUNT(1)
+        FROM
+            t_user,t_staff
+        WHERE
+            t_staff.staff_number=t_user.staff_number
+        AND
+            t_staff.name like CONCAT('%',#{search.name},'%')
+        AND
+            t_user.staff_number like CONCAT('%',#{search.staffNumber},'%')
+    </select>
+
+    <delete id="deleteUser">
+        DELETE FROM
+            t_user
+        WHERE
+            t_user.staff_number=#{staffNumber}
+    </delete>
+
+    <insert id="addAUser">
+        INSERT INTO
+            t_user(staff_number, password, salt, role_id)
+        VALUES
+            (#{addUser.staffNumber},#{password},#{salt},(SELECT t_role.role_id FROM t_role WHERE role_name=#{addUser.roleName}))
+    </insert>
+    <update id="updateUserRole">
+        UPDATE
+            t_user
+        SET
+            t_user.role_id=(SELECT role_id FROM t_role WHERE t_role.role_name=#{roleName})
+        WHERE
+            t_user.staff_number=#{staffNumber}
+    </update>
+
+    <select id="getStaffNumberByRoleId" resultType="string">
+        SELECT
+            staff_number
+        FROM
+            t_user
+        WHERE
+            role_id=#{roleId}
+    </select>
+</mapper>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flushbonading.cps.mapper.StaffMapper">
+    <select id="selectInformationByStaffNumber" resultType="com.flushbonading.cps.entity.dto.PersonalInformationDTO">
+        SELECT
+        t_staff.staff_number,t_staff.name,t_staff.gender,t_staff.phone,t_staff.id_card,t_department.department_name,t_post.post_name
+        FROM
+        t_staff,t_department,t_post
+        WHERE
+        t_staff.department_id=t_department.id AND t_staff.post_id=t_post.id
+        AND t_staff.staff_number=#{staffNumber}
+    </select>
+
+    <select id="getAllStaffMessage" resultType="com.flushbonading.cps.entity.vo.StaffVO">
+        SELECT
+            t_staff.staff_number,t_staff.name,t_staff.gender,t_department.id AS `department_id`,t_department.department_name,t_post.id AS `postId`,t_post.post_name,t_staff.phone,t_staff.id_card
+        FROM
+            t_staff,t_department,t_post
+        WHERE
+            t_staff.department_id=t_department.id
+        AND
+            t_post.id=t_staff.post_id
+        AND
+            t_staff.staff_number like CONCAT('%',#{search.staffNumber},'%')
+        AND
+            t_staff.name like CONCAT('%',#{search.name},'%')
+        ORDER BY t_staff.create_time desc
+        LIMIT #{page},6
+    </select>
+    <select id="getStaffCounts" resultType="int">
+        SELECT
+            COUNT(1)
+        FROM
+            t_staff
+        WHERE
+            t_staff.staff_number like CONCAT('%',#{search.staffNumber},'%')
+        AND
+            t_staff.name like CONCAT('%',#{search.name},'%')
+    </select>
+    <delete id="deleteStaff">
+        DELETE FROM
+            t_staff
+        WHERE
+            t_staff.staff_number=#{staffNumber}
+    </delete>
+    <insert id="addAStaff">
+        INSERT INTO
+            t_staff(STAFF_NUMBER, NAME, GENDER, DEPARTMENT_ID, ID_CARD, PHONE, POST_ID)
+        VALUES
+            (#{addStaff.staffNumber},#{addStaff.name},#{addStaff.gender},#{addStaff.departmentId},
+            #{addStaff.idCard},#{addStaff.phone},#{addStaff.postId})
+    </insert>
+
+    <update id="updatePersonalInformation">
+        UPDATE
+            t_staff
+        SET
+            id_card=#{personalInformation.idCard},phone=#{personalInformation.phone}
+        WHERE
+            staff_number=#{personalInformation.staffNumber}
+    </update>
+
+    <update id="updateSatffByStaffNumber">
+        UPDATE
+            t_staff
+        SET
+            name=#{edit.name},gender=#{edit.gender},
+            department_id=#{edit.departmentId},
+            post_id=#{edit.postId},
+            id_card=#{edit.idCard},phone=#{edit.phone}
+        WHERE
+            staff_number=#{edit.staffNumber}
+    </update>
+</mapper>

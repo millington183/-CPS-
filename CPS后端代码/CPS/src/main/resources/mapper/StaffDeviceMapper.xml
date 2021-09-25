@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flushbonading.cps.mapper.StaffDeviceMapper">
+    <select id="getAllStaffDeviceDatas" resultType="com.flushbonading.cps.entity.vo.StaffDeviceVO">
+        SELECT
+            create_time,counts
+        FROM
+            t_staff_device
+        where
+            create_time LIKE CONCAT('%',#{search.createTime},'%')
+        AND(
+                producer=#{search.staffNumber}
+            OR
+                packaging_worker=#{search.staffNumber}
+            )
+        ORDER BY create_time DESC
+        LIMIT #{page},7
+    </select>
+
+    <select id="getTotalCounts" resultType="int">
+        SELECT
+            COUNT(1)
+        FROM
+            t_staff_device
+        where
+            create_time LIKE CONCAT('%',#{search.createTime},'%')
+        AND(
+                producer=#{search.staffNumber}
+            OR
+                packaging_worker=#{search.staffNumber}
+            )
+    </select>
+
+    <select id="getStaffDeiviceIDs" resultType="int">
+        SELECT
+            id
+        from
+            t_staff_device
+        WHERE
+            create_time LIKE CONCAT('%',#{createTime},'%')
+        AND(
+                packaging_worker=#{staffNumber}
+            OR
+                producer=#{staffNumber}
+            )
+    </select>
+
+    <insert id="insertAStaffDevice">
+        INSERT INTO
+            t_staff_device(EQUIPMENT_ID, PACKAGING_WORKER, PRODUCER)
+        VALUES
+            (#{equipmentId},#{packagingWorker},#{producer})
+    </insert>
+
+    <update id="increase">
+        UPDATE
+            t_staff_device
+        SET
+            counts = counts +1
+        WHERE equipment_id=#{equipmentId} AND packaging_worker=#{packagingWorker} AND producer=#{producer}
+        ORDER BY create_time DESC
+        LIMIT 1
+    </update>
+</mapper>

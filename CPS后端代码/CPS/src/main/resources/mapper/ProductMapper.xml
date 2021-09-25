@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flushbonading.cps.mapper.ProductMapper">
+    <select id="getAllProductMessage" resultType="com.flushbonading.cps.entity.vo.ProductVO">
+        SELECT t_product.id,
+               equipment_id,
+               material_id,
+               ts.name as 'packaging_worker_name',
+               tt.name as 'producer_name',
+               result_name,
+               t_product.create_time
+        FROM t_product
+                 left join t_staff ts on ts.staff_number = t_product.packing_worker
+                 left join t_staff tt on tt.staff_number = t_product.producer
+                 left join t_result tr on t_product.result = tr.result_id
+        WHERE equipment_id LIKE CONCAT('%', #{search.equipmentId}, '%')
+          AND material_id LIKE CONCAT('%', #{search.materialId}, '%')
+          AND (
+                ts.name LIKE CONCAT('%', #{search.name}, '%')
+                OR
+                tt.name LIKE CONCAT('%', #{search.name}, '%')
+            )
+          AND t_product.create_time LIKE concat('%', #{search.createTime}, '%')
+        ORDER BY create_time desc
+        LIMIT #{page},7;
+    </select>
+
+    <select id="totalCounts" resultType="int">
+        SELECT COUNT(1)
+        FROM t_product
+                 left join t_staff ts on ts.staff_number = t_product.packing_worker
+                 left join t_staff tt on tt.staff_number = t_product.producer
+                 left join t_result tr on t_product.result = tr.result_id
+        WHERE equipment_id LIKE CONCAT('%', #{search.equipmentId}, '%')
+          AND material_id LIKE CONCAT('%', #{search.materialId}, '%')
+          AND (
+                ts.name LIKE CONCAT('%', #{search.name}, '%')
+                OR
+                tt.name LIKE CONCAT('%', #{search.name}, '%')
+            )
+          AND t_product.create_time LIKE concat('%', #{search.createTime}, '%')
+    </select>
+
+    <delete id="deleteProductById">
+        DELETE
+        FROM t_product
+        WHERE id = #{id}
+    </delete>
+
+    <insert id="insertAProduct">
+        INSERT INTO t_product(material_id, equipment_id, model_number, pressing_pressure, dwell_pressure,
+                              current_demagnetization, current_magnetization, weight, size, said_powder_time,
+                              packing_worker, producer, product_number, result)
+        VALUES (#{add.materialId}, #{add.equipmentId}, #{add.modelNumber}, #{add.pressingPressure},
+                #{add.dwellPressure}, #{add.currentDemagnetization}, #{add.currentMagnetization}, #{add.weight},
+                #{add.size}, #{add.saidPowderTime}, #{add.packagingWorker}, #{add.producer}, #{add.productNumber},
+                #{add.result})
+    </insert>
+
+    <select id="getProductMap" resultType="com.flushbonading.cps.entity.vo.ProductDataVO">
+        select material_id,
+               COUNT(1) AS counts
+        FROM t_product
+        WHERE create_time like concat(#{date}, '%')
+        group by material_id
+    </select>
+
+    <select id="getYieldNumber" resultType="int">
+        select COUNT(1)
+        FROM t_product
+        WHERE create_time between #{startTime} and #{endTime}
+          and result = 0
+    </select>
+    <select id="getDefectiveData" resultType="com.flushbonading.cps.entity.vo.DefectiveDataVO">
+        SELECT equipment_id as material,
+               result       as defective,
+               create_time
+        FROM t_product
+        WHERE result != 0
+        ORDER BY create_time DESC
+        LIMIT 6
+    </select>
+</mapper>

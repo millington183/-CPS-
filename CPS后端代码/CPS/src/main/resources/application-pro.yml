@@ -1,0 +1,72 @@
+# 设置服务器的端口号,设置字符集
+server:
+  port: 2000
+  servlet:
+    encoding:
+      charset: UTF-8
+
+# 关于数据源的一些配置
+spring:
+  application:
+    name: cps_system
+  # redis缓存
+  redis:
+    database: 0
+    host: 127.0.0.1
+    port: 6379
+    max-active: 8
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: 10000ms
+        max-idle: 200
+        min-idle: 5
+    password: 123456
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:59698/cps?useSSL=false&serverTimezone=GMT%2b8&characterEncoding=UTF-8&rewriteBatchedStatements=true&allowMultiQueries=true&allowPublicKeyRetrieval=true
+    username: root
+    password: Z423z423#
+
+# 下面是mybatisPlus的配置
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**.xml
+  type-aliases-package: com.flushbonading.cps.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+
+# 这里填写apikey
+machine:
+  apiKey: MLjSQAhJ93lvKGct9Uz4fhXWojhjlJE=
+
+
+# header
+header:
+  content-type: application/json
+
+
+# params
+params:
+  imei: 861878043668950
+  obj_id: 3200
+  obj_inst_id: 0
+  mode: 2
+  timeout: 5
+
+# body
+body:
+  res_id: 5750
+
+
+mq:
+  userName: cps_system
+  mqTopic: cps_system
+  mqSub: cps_system
+  accessKey: LOvFfuE3BB0x+B28XKjhymEr6+zTdYWWxNsnJS+zLkY=
+logging:
+  file:
+    path: /data/logs
+  level:
+    com.flushbonading.cps: debug

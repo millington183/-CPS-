@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flushbonading.cps.mapper.MaintenanceRecordMapper">
+    <select id="getAllMaintenanceRecord" resultType="com.flushbonading.cps.entity.vo.MaintenanceRecordVO">
+        SELECT
+            t_maintenance_record.id,equipment_id,t_staff.name,remark,t_maintenance_record.create_time
+        FROM
+            t_maintenance_record,t_staff
+        WHERE
+            t_maintenance_record.name=t_staff.staff_number
+        AND
+            equipment_id LIKE CONCAT('%',#{search.equipmentId},'%')
+        AND
+            t_staff.name LIKE CONCAT('%',#{search.name},'%')
+        AND
+            t_maintenance_record.create_time LIKE CONCAT('%',#{search.createTime},'%')
+        ORDER BY create_time desc
+        LIMIT #{page},7
+    </select>
+
+    <insert id="addAMaintenanceRecord">
+        INSERT INTO
+            t_maintenance_record(equipment_id,name,remark,create_time)
+        VALUES
+            (#{maintenanceRecord.equipmentId},#{maintenanceRecord.name},#{maintenanceRecord.remark},#{maintenanceRecord.createTime})
+    </insert>
+
+    <select id="getRecordCounts" resultType="int">
+        SELECT
+            COUNT(1)
+        FROM
+            t_maintenance_record
+        WHERE
+            equipment_id LIKE CONCAT('%',#{search.equipmentId},'%')
+        AND
+            name LIKE CONCAT('%',#{search.name},'%')
+        AND
+            create_time LIKE CONCAT('%',#{search.createTime},'%')
+    </select>
+
+    <delete id="deleteARecordById">
+        DELETE FROM
+            t_maintenance_record
+        WHERE
+            id=#{id}
+    </delete>
+
+    <update id="updateARecord">
+        UPDATE
+            t_maintenance_record
+        SET
+            name=#{updateRecord.name},create_time=#{updateRecord.createTime},remark=#{updateRecord.remark}
+        WHERE
+            id=#{id}
+    </update>
+
+    <select id="recentTimeByEquipmentId" resultType="string">
+        SELECT
+            create_time
+        FROM
+            t_maintenance_record
+        WHERE
+            equipment_id=#{equipmentId}
+        ORDER BY create_time DESC
+            LIMIT 1
+    </select>
+</mapper>

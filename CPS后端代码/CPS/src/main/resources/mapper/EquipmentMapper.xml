@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flushbonading.cps.mapper.EquipmentMapper">
+    <select id="getMaintenancePeriod" resultType="com.flushbonading.cps.entity.dto.EquipmentDTO">
+        SELECT
+            equipment_id,maintenance_period
+        FROM
+            t_equipment
+    </select>
+    <select id="queryEquipmentInfo" resultType="com.flushbonading.cps.entity.vo.EquipmentInfoVO">
+        SELECT  t_equipment.equipment_name,t_equipment.maintenance_period,tdp.pressing_pressure,tdp.dwell_pressure,tdp.current_demagnetization,tdp.current_magnetization
+        FROM t_equipment
+        LEFT JOIN t_device_parameters tdp ON t_equipment.equipment_id=tdp.equipment_id
+        WHERE tdp.Not_bind=0;
+    </select>
+
+    <update id="updatePeople">
+        UPDATE
+            t_equipment
+        SET
+            packaging_worker=#{packagingWorker},producer=#{producer}
+        WHERE
+            equipment_id=#{equipmentId}
+    </update>
+
+    <update id="increase">
+        UPDATE
+            t_equipment
+        SET
+            counts = counts + 1
+        WHERE
+            equipment_id=#{equipmentId}
+    </update>
+    <update id="updateMaintenancePeriod">
+        UPDATE
+            t_equipment
+        SET
+            maintenance_period = #{maintenancePeriod}
+        WHERE
+            equipment_id=#{equipmentId}
+    </update>
+
+    <select id="getPostDownMaintenanceDTO" resultType="com.flushbonading.cps.entity.dto.PostDownMaintenanceDTO">
+        SELECT
+            equipment_id,maintenance_period
+        FROM
+            t_equipment
+    </select>
+    <select id="getEquipmentName" resultType="com.flushbonading.cps.entity.vo.EquipmentNameVO">
+        SELECT equipment_id AS `key`,equipment_name AS `label`
+        FROM
+            t_equipment
+    </select>
+</mapper>

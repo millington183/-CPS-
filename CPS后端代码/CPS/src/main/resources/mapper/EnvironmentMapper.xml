@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flushbonading.cps.mapper.EnvironmentMapper">
+    <update id="updateEnvironment">
+        UPDATE
+            t_environment
+        SET
+            temperature=#{temperature},humidity=#{humidity},dust=#{dust}
+    </update>
+    <select id="getNowEnvironmentVO" resultType="com.flushbonading.cps.entity.vo.EnvironmentVO">
+        SELECT
+            temperature,humidity,dust
+        FROM
+            t_environment
+        WHERE
+            id = 1
+    </select>
+
+</mapper>

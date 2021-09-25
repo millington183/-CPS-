@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flushbonading.cps.mapper.PostMapper">
+    <select id="getPostByDepartment" resultType="com.flushbonading.cps.entity.dto.PostDTO">
+        SELECT
+            t_post.id,t_post.post_name
+        FROM
+            t_post,t_department,t_department_post
+        WHERE
+            t_department.id=t_department_post.department_id
+        AND
+            t_department_post.post_id=t_post.id
+        AND
+            t_department.department_name=#{departmentName}
+    </select>
+</mapper>

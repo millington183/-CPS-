@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flushbonading.cps.mapper.DiaryMapper">
+    <update id="increase">
+        UPDATE
+            t_diary
+        SET
+            counts = counts + 1
+        WHERE
+            equipment_id = #{equipmentId} AND time_id = #{timeId}
+    </update>
+
+    <update id="updateCounts">
+        update
+            t_diary
+        SET
+            counts = 0
+    </update>
+    <select id="getDiaryDataVos" resultType="com.flushbonading.cps.entity.vo.DiaryDataVO">
+        select time_id as name,SUM(counts) as value
+        FROM
+            t_diary
+        GROUP BY
+            time_id;
+    </select>
+</mapper>

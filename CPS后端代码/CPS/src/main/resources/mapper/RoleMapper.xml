@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flushbonading.cps.mapper.RoleMapper">
+    <select id="getAllRolesMessage" resultType="com.flushbonading.cps.entity.vo.ShowRoleVO">
+        SELECT
+            t_role.role_id,t_role.role_name,t_role.remark
+        FROM
+            t_role
+        WHERE
+            t_role.role_id LIKE CONCAT('%',#{search.roleId},'%')
+        AND
+            t_role.role_name LIKE CONCAT('%',#{search.roleName},'%')
+        ORDER BY t_role.create_time desc
+        LIMIT #{page},7
+    </select>
+    <select id="getAll" resultType="com.flushbonading.cps.entity.vo.RoleVO">
+        SELECT
+            t_role.role_id,t_role.role_name
+        FROM
+            t_role
+    </select>
+    <select id="getTotalCounts" resultType="int">
+        SELECT
+            COUNT(1)
+        FROM
+            t_role
+        WHERE
+            t_role.role_id LIKE CONCAT('%',#{search.roleId},'%')
+        AND
+            t_role.role_name LIKE CONCAT('%',#{search.roleName},'%')
+    </select>
+    <insert id="addARole">
+        INSERT INTO
+            t_role(role_id,role_name,remark)
+        VALUES
+            (#{addRole.roleId},#{addRole.roleName},#{addRole.remark})
+    </insert>
+    <delete id="deleteARole">
+        DELETE FROM
+            t_role
+        WHERE
+            t_role.role_id=#{roleId}
+    </delete>
+    <update id="editRole">
+        UPDATE
+            t_role
+        SET
+            role_name=#{editMenuDTO.roleName},remark=#{editMenuDTO.remark}
+        WHERE
+            role_id=#{editMenuDTO.roleId}
+    </update>
+</mapper>

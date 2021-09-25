@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flushbonading.cps.mapper.PerformanceMapper">
+    <insert id="insertAPerformance">
+        INSERT INTO
+            t_performance(staff_number,counts,number_of_work,number_of_leave,absenteeism,number_of_late,rewards_punishments,total_wage,remark,create_time)
+        VALUES
+            (#{addPerformance.staffNumber},
+                (SELECT
+                    SUM(t_staff_device.counts)
+                FROM
+                    t_staff_device
+                WHERE
+                    t_staff_device.create_time LIKE CONCAT('%',#{addPerformance.createTime},'%')
+                AND(
+                    t_staff_device.packaging_worker=#{addPerformance.staffNumber}
+                OR
+                    t_staff_device.producer=#{addPerformance.staffNumber}
+                )),
+                (SELECT
+                    COUNT(1)
+                FROM
+                    t_staff_device
+                WHERE
+                    t_staff_device.create_time LIKE CONCAT('%',#{addPerformance.createTime},'%')
+                AND(
+                    t_staff_device.packaging_worker=#{addPerformance.staffNumber}
+                OR
+                    t_staff_device.producer=#{addPerformance.staffNumber}
+                )),
+                #{addPerformance.numberOfLeave},#{addPerformance.absenteeism},#{addPerformance.NumberOfLate},#{addPerformance.rewardsPunishments},
+            (SELECT
+                base_wage
+            FROM
+                t_post
+            WHERE
+                t_post.id=#{postId}) + #{addPerformance.rewardsPunishments},
+                #{addPerformance.remark},#{createTime})
+    </insert>
+
+    <select id="selectAPerformance" resultType="com.flushbonading.cps.entity.Performance">
+        SELECT
+            id,staff_number,counts,number_of_work,number_of_leave,absenteeism,number_of_late,rewards_punishments,total_wage,remark,update_time,create_time
+        FROM
+            t_performance
+        WHERE
+            staff_number=#{staffNumber}
+        AND
+            create_time LIKE CONCAT('%',#{createTime},'%')
+    </select>
+
+    <select id="selectAllPerformances" resultType="com.flushbonading.cps.entity.vo.PerformanceVO">
+        SELECT
+            t_performance.id,t_performance.create_time,t_performance.staff_number,name,base_wage,counts,rewards_punishments,total_wage,remark
+        FROM
+            t_performance
+            left join t_staff ts on t_performance.staff_number=ts.staff_number
+            left join t_post tp on ts.post_id=tp.id
+        WHERE
+            name LIKE CONCAT('%',#{search.name},'%')
+        AND
+            t_performance.staff_number LIKE CONCAT('%',#{search.staffNumber},'%')
+        AND
+            t_performance.create_time LIKE CONCAT('%',#{search.createTime},'%')
+        ORDER BY t_performance.create_time DESC
+        LIMIT #{page},7
+    </select>
+
+    <select id="getTotalCounts" resultType="int">
+        SELECT
+            COUNT(1)
+        FROM
+            t_performance
+            left join t_staff ts on t_performance.staff_number=ts.staff_number
+            left join t_post tp on ts.post_id=tp.id
+        WHERE
+            name LIKE CONCAT('%',#{search.name},'%')
+        AND
+            t_performance.staff_number LIKE CONCAT('%',#{search.staffNumber},'%')
+        AND
+            t_performance.create_time LIKE CONCAT('%',#{search.createTime},'%')
+    </select>
+
+    <delete id="deletePerformanceByID">
+        DELETE FROM
+            t_performance
+        WHERE
+            id=#{id}
+    </delete>
+
+    <select id="selectAPerformanceByID" resultType="com.flushbonading.cps.entity.dto.EditPerformanceDTO">
+        SELECT
+            t_performance.id,t_performance.staff_number,name,counts,number_of_work,number_of_leave,absenteeism,number_of_late,rewards_punishments,total_wage,remark
+        FROM
+            t_performance,t_staff
+        WHERE
+            t_performance.id=#{id}
+        AND
+            t_performance.staff_number=t_staff.staff_number
+    </select>
+
+    <update id="updatePerformance">
+        UPDATE
+            t_performance
+        SET
+            counts=#{edit.counts},number_of_work=#{edit.numberOfWork},
+            number_of_leave=#{edit.numberOfLeave},absenteeism=#{edit.absenteeism},
+            number_of_late=#{edit.numberOfLate},rewards_punishments=#{edit.rewardsPunishments},
+            total_wage=#{edit.totalWage},remark=#{edit.remark}
+        WHERE
+            id=#{edit.id}
+    </update>
+
+    <select id="getPersonalPerformanceVOs" resultType="com.flushbonading.cps.entity.vo.PersonalPerformanceVO">
+        SELECT
+            t_performance.create_time,counts,number_of_work,number_of_leave,absenteeism,number_of_late,rewards_punishments,base_wage,total_wage,remark
+        FROM
+            t_performance,t_post
+        WHERE
+            t_performance.staff_number=#{staffNumber}
+        AND
+            t_post.id=#{postId}
+        AND
+            t_performance.create_time LIKE concat('%',#{year},'%')
+        ORDER BY t_performance.create_time DESC
+        LIMIT #{page},6
+    </select>
+
+    <select id="getPersonalPerformanceTotalCounts" resultType="int">
+        SELECT
+            COUNT(1)
+        FROM
+            t_performance
+        WHERE
+            t_performance.staff_number=#{staffNumber}
+        AND
+            t_performance.create_time LIKE concat('%',#{year},'%')
+    </select>
+
+</mapper>
